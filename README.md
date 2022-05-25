@@ -6,7 +6,7 @@ This repo has been archived for historical purposes.
 A python toolkit to tame the wild GRASS. 
 
 ```
-pip install git+https://github.com/perrygeo/mower.git@master#egg=mower
+pip3 install git+https://github.com/millionpoundhat/mower.git@master#egg=mower
 ```
 
 The goal is to provide a dead-simple context manager to handle GRASS Session state, allowing you to

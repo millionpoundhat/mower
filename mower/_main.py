@@ -1,4 +1,5 @@
 import subprocess
+from subprocess import check_output
 import sys
 import tempfile
 import os
@@ -8,32 +9,33 @@ import shutil
 """
 Due to ctypes, you have to set LD_LIBRARY_PATH ahead of time
 
-    export LD_LIBRARY_PATH=`grass71 --config path`/lib
+    export LD_LIBRARY_PATH=`grass --config path`/lib
     python your_script.py
 
 or
 
     su
-    echo "`grass71 --config path`/lib" > /etc/ld.so.conf.d/grass71.conf
+    echo "`grass --config path`/lib" > /etc/ld.so.conf.d/grass.conf
     ldconfig
     exit
     python your_script.py
 """
 
+
 class GrassSession():
-    def __init__(self, src=None, grassbin='/usr/local/bin/grass71', 
+    def __init__(self, src=None, grassbin='/usr/local/bin/grass',
                  persist=True, dir=None):
 
         # If dir is specified, load existing location or mapset and
         # assume persist=True
         self.persist = persist
 
-        # Else if src is not none, create new location 
+        # Else if src is not none, create new location
 
         # if src
         if type(src) == int:
             # Assume epsg code
-            self.location_seed = "EPSG:{}".format(src)
+            self.location_seed = f"EPSG:{src}"
         else:
             # Assume georeferenced vector or raster
             self.location_seed = src
@@ -41,15 +43,16 @@ class GrassSession():
         self.grassbin = grassbin
         # TODO assert grassbin is executable and supports what we need
 
-        startcmd = "{} --config path".format(grassbin) 
+        startcmd = f"{grassbin} --config path"
 
-        # Adapted from 
+        # Adapted from
         # http://grasswiki.osgeo.org/wiki/Working_with_GRASS_without_starting_it_explicitly#Python:_GRASS_GIS_7_without_existing_location_using_metadata_only
-        p = subprocess.Popen(startcmd, shell=True, 
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = p.communicate()
-        if p.returncode != 0:
-            raise Exception("ERROR: Cannot find GRASS GIS 7 start script ({})".format(startcmd))
+        p = subprocess.Popen(startcmd, shell=True,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out = check_output(startcmd, shell=True).decode("utf-8")
+        if p.wait() != 0:
+            raise Exception(
+                f"ERROR: Cannot find GRASS GIS 8 start script ({startcmd})")
         if sys.platform.startswith('linux'):
             self.gisbase = out.strip('\n')
         elif sys.platform.startswith('win'):
@@ -59,7 +62,7 @@ class GrassSession():
                 self.gisbase = out.strip('\n')
 
         self.gisdb = os.path.join(tempfile.gettempdir(), 'mowerdb')
-        self.location = "loc_{}".format(str(time.time()).replace(".","_"))
+        self.location = f"loc_{str(time.time()).replace(".", "_")}"
         self.mapset = "PERMANENT"
 
         os.environ['GISBASE'] = self.gisbase
@@ -79,9 +82,7 @@ class GrassSession():
         os.environ['PYTHONPATH'] = ':'.join(sys.path)
 
         import grass.script.setup as gsetup
-        gsetup.init(self.gisbase, self.gisdb, self.location, self.mapset)
-
-
+        gsetup.init(self.gisdb, self.location, self.mapset, self.gisbase)
 
     def create_location(self):
         try:
@@ -91,14 +92,16 @@ class GrassSession():
 
         createcmd = "{0} -c {1} -e {2}".format(
             self.grassbin,
-            self.location_seed, 
-            self.location_path) 
+            self.location_seed,
+            self.location_path)
 
-        p = subprocess.Popen(createcmd, shell=True, 
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("Creating the GRASS location with the following command" + createcmd)
+        p = subprocess.Popen(createcmd, shell=True,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
-        if p.returncode != 0:
-            raise Exception("ERROR: GRASS GIS 7 start script ({})".format(createcmd))
+        if p.wait() != 0:
+            raise Exception(
+                f"ERROR: GRASS GIS 8 start script ({createcmd})")
 
     @property
     def location_path(self):
@@ -119,4 +122,3 @@ class GrassSession():
 
     def __exit__(self, type, value, traceback):
         self.cleanup()
-
