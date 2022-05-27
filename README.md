@@ -1,5 +1,5 @@
-## Deprecated
-This repo has been archived for historical purposes. 
+## Mower
+This repo has been resurrected from [perrygeo] for some data processing. 
 
 <hr>
 
@@ -10,7 +10,7 @@ pip3 install git+https://github.com/millionpoundhat/mower.git@master#egg=mower
 ```
 
 The goal is to provide a dead-simple context manager to handle GRASS Session state, allowing you to
-run GRASS 7 commands via pygrass without having to deal with ...
+run GRASS commands via pygrass without having to deal with ...
 
 ### GISDBASE, LOCATIONS, MAPSETS, OH MY
 Even to GIS analysts who love code, GRASS presents a significant conceptual barrier in it's system of 
@@ -30,7 +30,7 @@ All of this required careful management of environment variables, a directory st
 to satisfy the GRASS location/mapset requirements and use of shell/system calls
 even when using Python.
 
-GRASS 7 and the new [pygrass](http://grasswiki.osgeo.org/wiki/Python/pygrass) module solves the system call issue by providing a python 
+GRASS and the [pygrass](http://grasswiki.osgeo.org/wiki/Python/pygrass) module solves the system call issue by providing a python 
 API to wrap the underlying C libs directly. But you still need to 
 [perform extensive work](http://grasswiki.osgeo.org/wiki/Working_with_GRASS_without_starting_it_explicitly#Python:_GRASS_GIS_7_without_existing_location_using_metadata_only) to make sure you've set up a location/mapset and that your
 system is set up to work in that environment.
@@ -66,7 +66,7 @@ For contrast, see the [example wiki code](http://grasswiki.osgeo.org/wiki/Workin
 
 If you want to work in the shell instead of python, try this built-in trick
 
-    grass71 -c dem.tif ~/grassdata/mylocation
+    grass -c dem.tif ~/grassdata/mylocation
 
 Which will create a new `PERMANENT` mapset in the `mylocation` location within the
 `grassdata` gisdbase and dump you directly into that session. Try with -e if you want to create

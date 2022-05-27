@@ -62,7 +62,7 @@ class GrassSession():
                 self.gisbase = out.strip('\n')
 
         self.gisdb = os.path.join(tempfile.gettempdir(), 'mowerdb')
-        self.location = f"loc_{str(time.time()).replace(".", "_")}"
+        self.location = f"loc_{str(time.time()).replace('.', '_')}"
         self.mapset = "PERMANENT"
 
         os.environ['GISBASE'] = self.gisbase
