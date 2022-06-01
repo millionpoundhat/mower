@@ -1,5 +1,5 @@
 ## Mower
-This repo has been resurrected from [perrygeo] for some data processing. 
+This repo has been resurrected from [perrygeo](https://github.com/perrygeo/mower) for some data processing. 
 
 <hr>
 
